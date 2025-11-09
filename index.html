@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Charts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .chart-container {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .chart {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-top: 0;
+            font-weight: normal;
+        }
+        
+        canvas {
+            border: 1px solid #eee;
+            margin-top: 10px;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        /* 文档内容样式 */
+        .document-content {
+            width: 880px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+        
+        .document-content h3 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .document-content ol {
+            padding-left: 20px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .document-content li {
+            margin-bottom: 10px;
+        }
+
+        /* 图片展示区域样式 */
+        .images-container {
+            width: 880px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .image-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Data Visualization</h2>
+        <h3>Probability Distribution & Position-Related Curve</h3>
+    </div>
+    
+    <div class="chart-container">
+        <!-- Left Chart: Probability Distribution -->
+        <div class="chart">
+            <h3>Probability Distribution</h3>
+            <canvas id="probabilityChart" width="400" height="300"></canvas>
+            <div id="probabilityTooltip" class="tooltip"></div>
+        </div>
+        
+        <!-- Right Chart: Position-Related Curve -->
+        <div class="chart">
+            <h3>Position-Related Curve</h3>
+            <canvas id="positionChart" width="400" height="300"></canvas>
+            <div id="positionTooltip" class="tooltip"></div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="resetBtn">Reset Animation</button>
+    </div>
+
+    <!-- 文档内容展示区域 -->
+    <div class="document-content">
+        <h3>Operation & Requirement Record</h3>
+        <ol>
+            <li>I sent the sample image to the AI with the instruction: Present it in HTML format and add some simple interactive effects.</li>
+            <li>The result the AI gave me had very low similarity to the sample image, so I made a clear request for an identical version with the instruction: No need to make it so complicated—just replicate the image I provided exactly.</li>
+            <li>At this point, since the code Doubao gave me had relatively low accuracy, I went to Gemini and entered the first instruction. It smoothly provided a piece of code with very high similarity. I then copied this code to Doubao for detailed modifications and gave the relevant instruction: Help me revise this code—extend the dotted line on the right image to align with the solid line below, and add a transition effect to one image and an interactive effect to the other (one each for the two images).</li>
+            <li>After the modification, inconsistencies appeared in the right image, so I made another modification request: The lines on the right image are different from my original one; please correct this. There’s no need to make the image effect too complicated. Then I successfully obtained code with a high degree of similarity.</li>
+        </ol>
+    </div>
+
+    <!-- 图片展示区域（已调换第一张和第三张图的顺序） -->
+    <div class="images-container">
+        <div class="image-item">
+            <div class="image-number">1</div>
+            <div class="image-container">
+                <img src="chart-image-1.png" alt="Image 1">
+            </div>
+        </div>
+        <div class="image-item">
+            <div class="image-number">2</div>
+            <div class="image-container">
+                <img src="chart-image-2.png" alt="Image 2">
+            </div>
+        </div>
+        <div class="image-item">
+            <div class="image-number">3</div>
+            <div class="image-container">
+                <img src="chart-image-3.png" alt="Image 3">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get canvas contexts
+        const probCtx = document.getElementById('probabilityChart').getContext('2d');
+        const posCtx = document.getElementById('positionChart').getContext('2d');
+        
+        // Get tooltips
+        const probTooltip = document.getElementById('probabilityTooltip');
+        const posTooltip = document.getElementById('positionTooltip');
+        
+        // Animation progress variables
+        let probAnimationProgress = 0;
+        let posAnimationProgress = 0;
+        
+        // Animation IDs
+        let probAnimationId = null;
+        let posAnimationId = null;
+        
+        // Probability chart data
+        const probData = {
+            p1: 0.2, // Low probability
+            p2: 0.6, // High probability
+            regions: []
+        };
+        
+        // Position chart data
+        const posData = {
+            curvePoints: [],
+            dashedPoints: []
+        };
+        
+        // Initialize the application
+        function init() {
+            startAnimations();
+            setupEventListeners();
+        }
+        
+        // Start all animations
+        function startAnimations() {
+            // Reset progress
+            probAnimationProgress = 0;
+            posAnimationProgress = 0;
+            
+            // Cancel existing animations
+            if (probAnimationId) cancelAnimationFrame(probAnimationId);
+            if (posAnimationId) cancelAnimationFrame(posAnimationId);
+            
+            // Start new animations
+            animateProbabilityChart();
+            animatePositionChart();
+        }
+        
+        // Animate probability distribution chart
+        function animateProbabilityChart() {
+            // Clear canvas
+            probCtx.clearRect(0, 0, 400, 300);
+            
+            // Draw axes
+            drawAxes(probCtx, 400, 300);
+            
+            // Draw chart elements with animation
+            const width = 400;
+            const height = 300;
+            const margin = 40;
+            const innerWidth = width - 2 * margin;
+            const innerHeight = height - 2 * margin;
+            
+            // Calculate positions
+            const p1Y = height - margin - innerHeight * probData.p1;
+            const p2Y = height - margin - innerHeight * probData.p2;
+            const i_n = margin + innerWidth * 0.2;
+            const iDn_n = margin + innerWidth * 0.4;
+            const x1 = margin + innerWidth * 0.8;
+            
+            // Draw p1 and p2 lines
+            probCtx.beginPath();
+            probCtx.setLineDash([5, 3]);
+            probCtx.strokeStyle = '#666';
+            probCtx.moveTo(margin, p1Y);
+            probCtx.lineTo(width - margin, p1Y);
+            probCtx.moveTo(margin, p2Y);
+            probCtx.lineTo(width - margin, p2Y);
+            probCtx.stroke();
+            probCtx.setLineDash([]);
+            
+            // Draw labels
+            probCtx.fillStyle = '#333';
+            probCtx.font = '12px Arial';
+            probCtx.textAlign = 'right';
+            probCtx.fillText('(Low) p₁', margin - 5, p1Y + 4);
+            probCtx.fillText('(High) p₂', margin - 5, p2Y + 4);
+            
+            probCtx.textAlign = 'center';
+            probCtx.fillText('i/n', i_n, height - margin + 15);
+            probCtx.fillText('(i+Δn)/n', iDn_n, height - margin + 15);
+            probCtx.fillText('1', width - margin, height - margin + 15);
+            
+            // Draw left region with animation
+            const leftRegionWidth = (iDn_n - i_n) * probAnimationProgress;
+            probCtx.fillStyle = 'rgba(150, 100, 200, 0.5)';
+            probCtx.fillRect(i_n, p2Y, leftRegionWidth, p1Y - p2Y);
+            
+            // Draw left region border
+            probCtx.beginPath();
+            probCtx.setLineDash([5, 3]);
+            probCtx.strokeStyle = '#666';
+            probCtx.strokeRect(i_n, p2Y, leftRegionWidth, p1Y - p2Y);
+            probCtx.stroke();
+            probCtx.setLineDash([]);
+            
+            // Draw right dashed box
+            probCtx.beginPath();
+            probCtx.setLineDash([5, 3]);
+            probCtx.strokeStyle = '#666';
+            probCtx.strokeRect(x1, p2Y, innerWidth * 0.15, p1Y - p2Y);
+            probCtx.stroke();
+            probCtx.setLineDash([]);
+            
+            // Draw bottom region with animation
+            const bottomRegionWidth = (width - 2 * margin) * probAnimationProgress;
+            probCtx.fillStyle = 'rgba(150, 100, 200, 0.3)';
+            probCtx.fillRect(margin, p1Y, bottomRegionWidth, (height - margin) - p1Y);
+            
+            // Draw arrow with animation
+            const arrowProgress = Math.min(probAnimationProgress * 2, 1);
+            if (arrowProgress > 0) {
+                probCtx.beginPath();
+                probCtx.moveTo(iDn_n, (p1Y + p2Y) / 2);
+                probCtx.lineTo(iDn_n + (x1 - iDn_n) * arrowProgress, (p1Y + p2Y) / 2);
+                probCtx.strokeStyle = '#333';
+                probCtx.stroke();
+                
+                // Draw arrow head
+                if (arrowProgress > 0.9) {
+                    probCtx.beginPath();
+                    probCtx.moveTo(x1, (p1Y + p2Y) / 2);
+                    probCtx.lineTo(x1 - 5, (p1Y + p2Y) / 2 - 5);
+                    probCtx.lineTo(x1 - 5, (p1Y + p2Y) / 2 + 5);
+                    probCtx.fillStyle = '#333';
+                    probCtx.fill();
+                }
+            }
+            
+            // Update regions for interaction
+            probData.regions = [
+                {
+                    x: i_n,
+                    y: p2Y,
+                    width: iDn_n - i_n,
+                    height: p1Y - p2Y,
+                    label: 'High Probability Region',
+                    value: `p₂ - p₁ = ${(probData.p2 - probData.p1).toFixed(2)}`
+                },
+                {
+                    x: margin,
+                    y: p1Y,
+                    width: width - 2 * margin,
+                    height: (height - margin) - p1Y,
+                    label: 'Low Probability Region',
+                    value: `p₁ = ${probData.p1.toFixed(2)}`
+                }
+            ];
+            
+            // Continue animation
+            if (probAnimationProgress < 1) {
+                probAnimationProgress += 0.01;
+                probAnimationId = requestAnimationFrame(animateProbabilityChart);
+            }
+        }
+        
+        // Animate position-related curve chart
+        function animatePositionChart() {
+            // Clear canvas
+            posCtx.clearRect(0, 0, 400, 300);
+            
+            // Draw axes
+            drawAxes(posCtx, 400, 300);
+            
+            // Draw chart elements with animation
+            const width = 400;
+            const height = 300;
+            const margin = 40;
+            const innerWidth = width - 2 * margin;
+            const innerHeight = height - 2 * margin;
+            
+            // Generate curve points if not already generated
+            if (posData.curvePoints.length === 0) {
+                generateCurvePoints();
+            }
+            
+            // Draw solid curve with animation
+            posCtx.beginPath();
+            posCtx.strokeStyle = 'green';
+            posCtx.lineWidth = 2;
+            
+            const solidPointsToDraw = Math.floor(posData.curvePoints.length * posAnimationProgress);
+            for (let i = 0; i < solidPointsToDraw; i++) {
+                if (i === 0) {
+                    posCtx.moveTo(posData.curvePoints[i].x, posData.curvePoints[i].y);
+                } else {
+                    posCtx.lineTo(posData.curvePoints[i].x, posData.curvePoints[i].y);
+                }
+            }
+            posCtx.stroke();
+            
+            // Draw dashed curve with animation
+            posCtx.beginPath();
+            posCtx.setLineDash([5, 3]);
+            posCtx.strokeStyle = '#666';
+            
+            const dashedPointsToDraw = Math.floor(posData.dashedPoints.length * posAnimationProgress);
+            for (let i = 0; i < dashedPointsToDraw; i++) {
+                if (i === 0) {
+                    posCtx.moveTo(posData.dashedPoints[i].x, posData.dashedPoints[i].y);
+                } else {
+                    posCtx.lineTo(posData.dashedPoints[i].x, posData.dashedPoints[i].y);
+                }
+            }
+            posCtx.stroke();
+            posCtx.setLineDash([]);
+            
+            // Draw axis labels
+            posCtx.fillStyle = '#333';
+            posCtx.font = '12px Arial';
+            posCtx.textAlign = 'center';
+            posCtx.fillText('0', margin, height - margin + 15);
+            posCtx.fillText('0.5', margin + innerWidth * 0.5, height - margin + 15);
+            posCtx.fillText('1', width - margin, height - margin + 15);
+            posCtx.fillText('position', width / 2, height - 5);
+            
+            posCtx.textAlign = 'right';
+            posCtx.fillText('0', margin - 5, height - margin + 5);
+            posCtx.fillText('20', margin - 5, height - margin - innerHeight * 0.5 + 5);
+            posCtx.fillText('40', margin - 5, margin + 5);
+            
+            // Continue animation
+            if (posAnimationProgress < 1) {
+                posAnimationProgress += 0.01;
+                posAnimationId = requestAnimationFrame(animatePositionChart);
+            }
+        }
+        
+        // Generate curve points for position chart
+        function generateCurvePoints() {
+            const width = 400;
+            const height = 300;
+            const margin = 40;
+            const innerWidth = width - 2 * margin;
+            const innerHeight = height - 2 * margin;
+            
+            // Clear existing points
+            posData.curvePoints = [];
+            posData.dashedPoints = [];
+            
+            // Generate solid curve points s(simplified line segments)
+            const solidSegments = [
+                { x: 0.1, y: 36 },
+                { x: 0.4, y: 32 },
+                { x: 0.7, y: 28 },
+                { x: 0.9, y: 22 }
+            ];
+            
+            // Generate dashed curve points (simplified line segments)
+            const dashedSegments = [
+                { x: 0.1, y: 38 },
+                { x: 0.4, y: 34 },
+                { x: 0.7, y: 30 },
+                { x: 0.9, y: 24 }
+            ];
+            
+            // Generate points for solid curve
+            generatePointsFromSegments(solidSegments, posData.curvePoints, margin, innerWidth, innerHeight, height);
+            
+            // Generate points for dashed curve
+            generatePointsFromSegments(dashedSegments, posData.dashedPoints, margin, innerWidth, innerHeight, height);
+        }
+        
+        // Generate points from line segments
+        function generatePointsFromSegments(segments, pointArray, margin, innerWidth, innerHeight, chartHeight) {
+            // Add start point
+            const startPoint = segments[0];
+            const startX = margin + startPoint.x * innerWidth;
+            const startY = chartHeight - margin - (startPoint.y / 40) * innerHeight;
+            
+            pointArray.push({
+                x: startX,
+                y: startY,
+                position: startPoint.x,
+                value: startPoint.y
+            });
+            
+            // Generate points between each segment
+            for (let i = 0; i < segments.length - 1; i++) {
+                const start = segments[i];
+                const end = segments[i + 1];
+                const segmentLength = end.x - start.x;
+                const step = segmentLength / 20; // 20 points per segment
+                
+                for (let j = 1; j <= 20; j++) {
+                    const t = j / 20;
+                    const x = start.x + t * segmentLength;
+                    const y = start.y + t * (end.y - start.y); // Linear interpolation
+                    const pointX = margin + x * innerWidth;
+                    const pointY = chartHeight - margin - (y / 40) * innerHeight;
+                    
+                    pointArray.push({
+                        x: pointX,
+                        y: pointY,
+                        position: x,
+                        value: y
+                    });
+                }
+            }
+        }
+        
+        // Draw axes for a chart
+        function drawAxes(ctx, width, height) {
+            const margin = 40;
+            
+            // Draw axes
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            
+            // X-axis
+            ctx.moveTo(margin, height - margin);
+            ctx.lineTo(width - margin, height - margin);
+            
+            // Y-axis
+            ctx.moveTo(margin, margin);
+            ctx.lineTo(margin, height - margin);
+            
+            ctx.stroke();
+            
+            // Draw arrow heads
+            ctx.beginPath();
+            ctx.moveTo(width - margin, height - margin);
+            ctx.lineTo(width - margin - 5, height - margin - 5);
+            ctx.lineTo(width - margin - 5, height - margin + 5);
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(margin, margin);
+            ctx.lineTo(margin - 5, margin + 5);
+            ctx.lineTo(margin + 5, margin + 5);
+            ctx.fill();
+        }
+        
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', startAnimations);
+            
+            // Probability chart mouse interaction
+            document.getElementById('probabilityChart').addEventListener('mousemove', handleProbabilityChartMouseMove);
+            document.getElementById('probabilityChart').addEventListener('mouseout', handleProbabilityChartMouseOut);
+            
+            // Position chart mouse interaction
+            document.getElementById('positionChart').addEventListener('mousemove', handlePositionChartMouseMove);
+            document.getElementById('positionChart').addEventListener('mouseout', handlePositionChartMouseOut);
+        }
+        
+        // Handle mouse move on probability chart
+        function handleProbabilityChartMouseMove(event) {
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Check if mouse is over any region
+            let hoveredRegion = null;
+            for (const region of probData.regions) {
+                if (x >= region.x && x <= region.x + region.width &&
+                    y >= region.y && y <= region.y + region.height) {
+                    hoveredRegion = region;
+                    break;
+                }
+            }
+            
+            if (hoveredRegion) {
+                // Show tooltip
+                probTooltip.style.opacity = '1';
+                probTooltip.innerHTML = `<strong>${hoveredRegion.label}</strong><br>${hoveredRegion.value}`;
+                probTooltip.style.left = `${event.pageX + 10}px`;
+                probTooltip.style.top = `${event.pageY + 10}px`;
+                
+                // Redraw chart with highlighted region
+                probCtx.clearRect(0, 0, 400, 300);
+                drawAxes(probCtx, 400, 300);
+                
+                // Redraw all elements
+                animateProbabilityChart();
+                
+                // Highlight the region
+                probCtx.fillStyle = 'rgba(150, 100, 200, 0.7)';
+                probCtx.fillRect(hoveredRegion.x, hoveredRegion.y, hoveredRegion.width, hoveredRegion.height);
+            } else {
+                // Hide tooltip
+                probTooltip.style.opacity = '0';
+            }
+        }
+        
+        // Handle mouse out from probability chart
+        function handleProbabilityChartMouseOut() {
+            probTooltip.style.opacity = '0';
+            // Redraw chart without highlight
+            animateProbabilityChart();
+        }
+        
+        // Handle mouse move on position chart
+        function handlePositionChartMouseMove(event) {
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Find closest point on either curve
+            let closestPoint = null;
+            let minDistance = Infinity;
+            let pointType = '';
+            
+            // Check solid curve points
+            for (const point of posData.curvePoints) {
+                const distance = Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2));
+                if (distance < 15 && distance < minDistance) {
+                    minDistance = distance;
+                    closestPoint = point;
+                    pointType = 'Solid Line';
+                }
+            }
+            
+            // Check dashed curve points if no solid point found
+            if (!closestPoint) {
+                for (const point of posData.dashedPoints) {
+                    const distance = Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2));
+                    if (distance < 15 && distance < minDistance) {
+                        minDistance = distance;
+                        closestPoint = point;
+                        pointType = 'Dashed Line';
+                    }
+                }
+            }
+            
+            if (closestPoint) {
+                // Show tooltip
+                posTooltip.style.opacity = '1';
+                posTooltip.innerHTML = `${pointType}<br>Position: ${closestPoint.position.toFixed(2)}<br>Value: ${closestPoint.value.toFixed(1)}`;
+                posTooltip.style.left = `${event.pageX + 10}px`;
+                posTooltip.style.top = `${event.pageY + 10}px`;
+                
+                // Change cursor style
+                event.target.style.cursor = 'pointer';
+            } else {
+                // Hide tooltip
+                posTooltip.style.opacity = '0';
+                event.target.style.cursor = 'default';
+            }
+        }
+        
+        // Handle mouse out from position chart
+        function handlePositionChartMouseOut() {
+            posTooltip.style.opacity = '0';
+            // Redraw chart without highlight
+            animatePositionChart();
+        }
+        
+        // Start the application when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
